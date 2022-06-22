@@ -1,10 +1,12 @@
 import React from 'react';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import SockJS from 'sockjs-client';
 import { Client, IFrame, IMessage } from '@stomp/stompjs';
 
 
-import { MessageArea } from './messageArea';
-import { MessageData } from './message';
+import { MessageArea } from './MessageArea/MessageArea';
+import { MessageData } from './MessageArea/Message';
+import { PageNotFound } from './PageNotFound/PageNotFound';
 
 type AppProps = {
     initialMessages: MessageData[]
@@ -56,9 +58,16 @@ export class App extends React.Component<AppProps, AppState> {
     }
 
     render(): JSX.Element {
-        return <MessageArea 
-            messages={this.state.messages}
-            onSendMessage={this.onSendMessage}
-            />
+        return <BrowserRouter>
+            <Routes>
+                <Route index element={
+                    <MessageArea 
+                    messages={this.state.messages}
+                    onSendMessage={this.onSendMessage}
+                     />
+                }/>
+                <Route path="*" element={<PageNotFound/>}/>
+            </Routes>
+        </BrowserRouter>
     }
 }

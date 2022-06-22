@@ -1,6 +1,6 @@
 import React from 'react';
-import { MessageData, Message } from './message';
-import { InputArea } from './inputArea';
+import { MessageData, Message } from './Message';
+import { InputArea } from './InputArea';
 
 type MessageAreaProps = {
     messages: MessageData[]

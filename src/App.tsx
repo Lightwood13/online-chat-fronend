@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import SockJS from 'sockjs-client';
 import { Client, IFrame, IMessage } from '@stomp/stompjs';
@@ -13,63 +13,47 @@ type AppProps = {
     initialMessages: MessageData[]
 }
 
-type AppState = {
-    messages: MessageData[]
-}
+export const App = (props: AppProps) => {
+    const [messages, setMessages] = useState(props.initialMessages);
 
-export class App extends React.Component<AppProps, AppState> {
-    stompClient: Client;
+    const stompClient = new Client({
+        webSocketFactory: () => new SockJS('http://localhost:8080/ws-connect')
+    });
 
-    constructor(props: AppProps) {
-        super(props);
-        this.state = {
-            messages: this.props.initialMessages
-        };
+    stompClient.onConnect = function (_frame: IFrame) {
+        this.subscribe('/messages/new', onMessageReceived);
+    };
 
-        this.onSendMessage = this.onSendMessage.bind(this);
-        const onMessageReceived = this.onMessageReceived.bind(this);
+    useEffect(() => {
+        stompClient.activate();
+    });
 
-        this.stompClient = new Client({
-            webSocketFactory: () => new SockJS('http://localhost:8080/ws-connect')
-        });
-        this.stompClient.onConnect = function (frame: IFrame) {
-            this.subscribe('/messages/new', onMessageReceived);
-        };
-    }
-
-    componentDidMount() {
-        this.stompClient.activate();
-    }
-
-    onMessageReceived(message: IMessage) {
+    const onMessageReceived = (message: IMessage) => {
         const newMessage: MessageData = JSON.parse(message.body);
-        const oldMessages: MessageData[] = this.state.messages;
-        this.setState({
-            messages: oldMessages.concat([newMessage])
-        });
-    }
+        setMessages(messages.concat([newMessage]));
+    };
 
-    onSendMessage(message: MessageData) {
+    const onSendMessage = (message: MessageData) => {
         if (message.sender === '')
             message.sender = 'Anonymous';
-        this.stompClient.publish({
+        stompClient.publish({
             destination: '/chat/send',
             body: JSON.stringify(message)
         });
-    }
+    };
 
-    render(): JSX.Element {
-        return <BrowserRouter>
+    return (
+        <BrowserRouter>
             <Routes>
                 <Route index element={
                     <MessageArea 
-                    messages={this.state.messages}
-                    onSendMessage={this.onSendMessage}
-                     />
+                    messages={messages}
+                    onSendMessage={onSendMessage}
+                    />
                 }/>
                 <Route path='/login' element={<LoginPage/>}/>
                 <Route path='*' element={<PageNotFound/>}/>
             </Routes>
-        </BrowserRouter>;
-    }
-}
+        </BrowserRouter>
+    );
+};

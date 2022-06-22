@@ -2,7 +2,7 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 
 import { App } from './App';
-import { MessageData } from './MessageArea/Message';
+import { MessageData } from './ChatPage/Message';
 
 
 // ========================================

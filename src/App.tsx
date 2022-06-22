@@ -4,9 +4,10 @@ import SockJS from 'sockjs-client';
 import { Client, IFrame, IMessage } from '@stomp/stompjs';
 
 
-import { MessageArea } from './MessageArea/MessageArea';
-import { MessageData } from './MessageArea/Message';
+import { MessageArea } from './ChatPage/MessageArea';
+import { MessageData } from './ChatPage/Message';
 import { PageNotFound } from './PageNotFound/PageNotFound';
+import { LoginPage } from './LoginPage/LoginPage';
 
 type AppProps = {
     initialMessages: MessageData[]
@@ -17,13 +18,13 @@ type AppState = {
 }
 
 export class App extends React.Component<AppProps, AppState> {
-    stompClient: Client
+    stompClient: Client;
 
     constructor(props: AppProps) {
         super(props);
         this.state = {
             messages: this.props.initialMessages
-        }
+        };
 
         this.onSendMessage = this.onSendMessage.bind(this);
         const onMessageReceived = this.onMessageReceived.bind(this);
@@ -32,8 +33,8 @@ export class App extends React.Component<AppProps, AppState> {
             webSocketFactory: () => new SockJS('http://localhost:8080/ws-connect')
         });
         this.stompClient.onConnect = function (frame: IFrame) {
-            this.subscribe('/messages/new', onMessageReceived)
-        }
+            this.subscribe('/messages/new', onMessageReceived);
+        };
     }
 
     componentDidMount() {
@@ -45,7 +46,7 @@ export class App extends React.Component<AppProps, AppState> {
         const oldMessages: MessageData[] = this.state.messages;
         this.setState({
             messages: oldMessages.concat([newMessage])
-        })
+        });
     }
 
     onSendMessage(message: MessageData) {
@@ -66,8 +67,9 @@ export class App extends React.Component<AppProps, AppState> {
                     onSendMessage={this.onSendMessage}
                      />
                 }/>
-                <Route path="*" element={<PageNotFound/>}/>
+                <Route path='/login' element={<LoginPage/>}/>
+                <Route path='*' element={<PageNotFound/>}/>
             </Routes>
-        </BrowserRouter>
+        </BrowserRouter>;
     }
 }

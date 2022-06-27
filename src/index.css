@@ -19,7 +19,7 @@ body {
 
 .message {
   list-style: none;
-  background-color: rgb(220, 220, 220);
+  background-color: white;
   width: fit-content;
   max-width: 400px;
   border-radius: 10px;
@@ -36,6 +36,12 @@ body {
 .message-text {
   margin: 5px;
   overflow-wrap: break-word;
+}
+
+.message-senton {
+  font-size: 15px;
+  color: grey;
+  text-align: right;
 }
 
 input {
@@ -55,6 +61,9 @@ input {
 .send-button {
   margin: 5px;
   font-size: 18px;
+  border-radius: 5px;
+  background-color: cornflowerblue;
+  color: white;
 }
 
 .input-area {
@@ -62,6 +71,52 @@ input {
 }
 
 .message-area {
-  background-color: cornflowerblue;
+  background-color: #daeaf1;
   max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 10px;
+  padding: 5px;
+}
+
+.login-form {
+  margin-top: 50px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 30px;
+  border-radius: 10px;
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+  background-color:#daeaf1;
+}
+
+.login-label {
+  margin-left: 10px;
+}
+
+.login-input {
+  margin-bottom: 10px;
+}
+
+.login-button {
+  margin: 5px;
+  font-size: 18px;
+  border-radius: 3px;
+  background-color: cornflowerblue;
+  color: white;
+}
+
+.signup-text {
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 5px;
+}
+
+.login-error-text {
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 5px;
+  color: red;
+  font-weight: bold;
 }

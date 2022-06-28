@@ -4,10 +4,10 @@ import { Message, MessageData } from './Message';
 
 export function MessageArea (props: {
     messageList: MessageData[]
-    onSendMessage: (message: string) => void
+    onSendMessage: (text: string) => void
 }) {
     
-    return (
+    return props.messageList.length === 0 ? <div/> : (
         <div className='message-area'>
             <ul className='message-list'>
                     {props.messageList.map( (message: MessageData) => 

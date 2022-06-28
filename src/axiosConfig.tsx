@@ -1,7 +1,17 @@
 import axios from 'axios';
-import React from 'react';
 
-export const axiosInstance = axios.create();
+export const axiosInstance = axios.create({
+    transformResponse: (response: string) : any => {
+        if (response.length === 0)
+            return response;
+        return JSON.parse(response, (key: string, value: any) => {
+            if (key === 'sentOn')
+                return new Date(value);
+            else
+                return value;
+        });
+    }
+});
 
 export function hasJWTToken(): boolean {
     return localStorage.getItem('token') !== null;

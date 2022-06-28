@@ -4,7 +4,12 @@
 
 body {
   font: 18px "Century Gothic", Futura, sans-serif;
-  margin: 20px;
+  padding: 0;
+  margin: 0;
+}
+
+#root {
+  height: 100vh;
 }
 
 .page-not-found {
@@ -12,13 +17,53 @@ body {
   font-weight: bold;
 }
 
+.chat-page {
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+}
+
+.chat-list {
+  flex: 0 1 auto;
+  width: 200px;
+  float: left;
+  margin: 10px;
+  list-style: none;
+  padding: 0;
+}
+
+.chat-item {
+  padding: 10px;
+  font-weight: bold;
+}
+
+.chat-item:hover {
+  background-color: #e0e0e0;
+}
+
+.chat-item:focus {
+  background-color: cornflowerblue;
+  color: white;
+}
+
+.message-area {
+  flex: 1 1 auto;
+  background-color: #daeaf1;
+  height: 100%;
+  padding: 5px;
+  display: flex;
+  flex-flow: column;
+}
+
 .message-list {
-  padding: 5px 0 0 0;
+  padding: 0;
   margin: 0;
+  list-style: none;
+  overflow-y: scroll;
+  flex: 1 1 auto;
 }
 
 .message {
-  list-style: none;
   background-color: white;
   width: fit-content;
   max-width: 400px;
@@ -50,12 +95,8 @@ input {
   height: 1.5em;
 }
 
-.name-field {
-  width: 100px;
-}
-
 .input-field {
-  width: 500px;
+  flex: 1 1 auto;
 }
 
 .send-button {
@@ -64,19 +105,13 @@ input {
   border-radius: 5px;
   background-color: cornflowerblue;
   color: white;
+  flex: 0 1 auto; 
 }
 
 .input-area {
+  flex: 0 1 auto;
   display: flex;
-}
-
-.message-area {
-  background-color: #daeaf1;
-  max-width: 500px;
-  margin-left: auto;
-  margin-right: auto;
-  border-radius: 10px;
-  padding: 5px;
+  flex-direction: row;
 }
 
 .login-form {

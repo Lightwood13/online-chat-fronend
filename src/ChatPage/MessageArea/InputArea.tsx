@@ -1,14 +1,10 @@
 import React, { ChangeEvent, FormEvent, useState } from 'react';
 
 
-export const InputArea = (props: {
-    onSubmit: (value: string) => void 
-}) => {
+export function InputArea (props: {
+    onSubmit: (text: string) => void 
+}) {
     const [inputValue, setInputValue] = useState('');
-
-    const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-        setInputValue(event.target.value);
-    };
 
     const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -21,9 +17,9 @@ export const InputArea = (props: {
             <input 
                 className='input-field' 
                 value={inputValue}
-                onChange={handleInputChange}
+                onChange={e => setInputValue(e.target.value)}
             />
             <button className='send-button'>Send</button>
         </form>
     );
-};
+}

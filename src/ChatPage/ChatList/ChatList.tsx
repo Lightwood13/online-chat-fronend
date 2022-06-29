@@ -1,15 +1,18 @@
 import React from 'react';
-import { ChatData, ChatListItem } from './ChatListItem';
+import { ChatData } from '../../model/ChatData';
+import { ChatListItem } from './ChatListItem';
 
 export function ChatList(props: {
     chatList: ChatData[],
-    onChatSelected: (chatId: string) => void
+    activeChatId: string | null
+    onChatSelected: (chat: ChatData) => void
 }) {
     return (<ul className='chat-list'>
         {props.chatList.map( (chat: ChatData) => 
             <ChatListItem 
                 key={chat.id} 
-                data={chat} 
+                data={chat}
+                isActive={chat.id === props.activeChatId}
                 onChatSelected={props.onChatSelected}
             />)}
     </ul>);

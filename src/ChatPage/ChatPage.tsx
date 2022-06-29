@@ -5,16 +5,21 @@ import { useNavigate } from 'react-router-dom';
 import SockJS from 'sockjs-client';
 import { axiosInstance, getJWTToken, hasJWTToken } from '../axiosConfig';
 import { ChatList } from './ChatList/ChatList';
-import { ChatData } from './ChatList/ChatListItem';
-import { MessageData } from './MessageArea/Message';
 import { MessageArea } from './MessageArea/MessageArea';
+import { ChatInfo } from './ChatInfo/ChatInfo';
+import { MessageData } from '../model/MessageData';
+import { ChatData } from '../model/ChatData';
 
 
 export function ChatPage() {
     const [chatListLoaded, setChatListLoaded] = useState(false);
     const [chatList, setChatList] = useState<ChatData[]>([]);
-    const [activeChatId, setActiveChatId] = useState<string | null>(null);
+    const [activeChat, setActiveChat] = useState<ChatData | null>(null);
+
+    const[showChatInfo, setShowChatInfo] = useState(false);
+
     const [messageList, setMessageList] = useState<MessageData[]>([]);
+
     const [stompClient, setStompClient] = useState( new Client({
         webSocketFactory: () => new SockJS('http://localhost:8080/ws-connect'),
         connectHeaders: {
@@ -37,20 +42,24 @@ export function ChatPage() {
     }
 
     function onSendMessage(text: string) {
-        if (activeChatId !== null) {
+        if (activeChat !== null) {
             stompClient.publish({
                 destination: '/chat/send',
                 body: JSON.stringify({
                     text: text,
-                    groupChatId: activeChatId
+                    groupChatId: activeChat.id
                 })
             });
         }
     }
 
-    async function onChatSelected(chatId: string) {
-        setMessageList(await getChatMessages(chatId));
-        setActiveChatId(chatId);
+    async function onChatSelected(chat: ChatData) {
+        setMessageList(await getChatMessages(chat.id));
+        setActiveChat(chat);
+    }
+
+    function onShowChatInfo() {
+        setShowChatInfo(true);
     }
 
     async function getChatMessages(chatId: string): Promise<MessageData[]> {
@@ -89,13 +98,29 @@ export function ChatPage() {
         });
     }, []);
 
-    return (chatListLoaded 
-        ? (
+    if (!chatListLoaded) {
+        return null;
+    }
+        
+    return (
             <div className='chat-page'>
-                <ChatList chatList={chatList} onChatSelected={onChatSelected}/>
-                <MessageArea messageList={messageList} onSendMessage={onSendMessage}/>
+                <ChatList 
+                    chatList={chatList}
+                    activeChatId={activeChat === null ? null : activeChat.id}
+                    onChatSelected={onChatSelected}
+                />
+                <MessageArea 
+                    activeChat={activeChat}
+                    messageList={messageList}
+                    onSendMessage={onSendMessage}
+                    onShowChatInfo={onShowChatInfo}
+                />
+                <ChatInfo
+                    chat={activeChat}
+                    show={showChatInfo}
+                    onClose={() => setShowChatInfo(false)}
+                />
             </div>
-        )
-        : <div/>);
+        );
 
 }

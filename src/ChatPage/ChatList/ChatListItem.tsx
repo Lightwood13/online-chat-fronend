@@ -1,19 +1,14 @@
 import React from 'react';
-import { MessageData } from '../MessageArea/Message';
-
-export type ChatData = {
-    id: string,
-    name: string,
-    lastMessage: MessageData | null
-}
+import { ChatData } from '../../model/ChatData';
 
 export const ChatListItem = (props: {
     data: ChatData,
-    onChatSelected: (chatId: string) => void
+    isActive: boolean,
+    onChatSelected: (chat: ChatData) => void
 }) => (
     <li
-        className='chat-item'
+        className={props.isActive ? 'active-chat-item' : 'chat-item'}
         tabIndex={1}
-        onFocus={() => props.onChatSelected(props.data.id)}
+        onFocus={() => props.onChatSelected(props.data)}
     >{props.data.name}</li>
 );

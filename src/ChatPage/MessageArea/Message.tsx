@@ -1,11 +1,5 @@
 import React from 'react';
-
-export type MessageData = {
-    id: string,
-    authorName: string,
-    text: string
-    sentOn: Date
-}
+import { MessageData } from '../../model/MessageData';
 
 export const Message = (messageProps: {
     data: MessageData

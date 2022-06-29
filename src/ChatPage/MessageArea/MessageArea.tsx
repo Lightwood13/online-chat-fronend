@@ -1,14 +1,24 @@
 import React from 'react';
+import { ChatData } from '../../model/ChatData';
+import { MessageData } from '../../model/MessageData';
+import { ChatHeader } from './ChatHeader';
 import { InputArea } from './InputArea';
-import { Message, MessageData } from './Message';
+import { Message } from './Message';
 
 export function MessageArea (props: {
-    messageList: MessageData[]
-    onSendMessage: (text: string) => void
+    activeChat: ChatData | null,
+    messageList: MessageData[],
+    onSendMessage: (text: string) => void,
+    onShowChatInfo: () => void
 }) {
     
-    return props.messageList.length === 0 ? <div/> : (
+    if (props.messageList.length === 0) {
+        return null;
+    }
+
+    return (
         <div className='message-area'>
+            <ChatHeader chat={props.activeChat} onShowChatInfo={props.onShowChatInfo}/>
             <ul className='message-list'>
                     {props.messageList.map( (message: MessageData) => 
                     (<Message key={message.id} data={message}/>)

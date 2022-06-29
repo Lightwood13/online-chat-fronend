@@ -9,16 +9,22 @@ import { MessageArea } from './MessageArea/MessageArea';
 import { ChatInfo } from './ChatInfo/ChatInfo';
 import { MessageData } from '../model/MessageData';
 import { ChatData } from '../model/ChatData';
+import { ProfileInfo } from './ProfileInfo/ProfileInfo';
+import { UserData } from '../model/UserData';
 
 
 export function ChatPage() {
+    const [user, setUser] = useState<UserData | null>(null);
+
     const [chatListLoaded, setChatListLoaded] = useState(false);
     const [chatList, setChatList] = useState<ChatData[]>([]);
     const [activeChat, setActiveChat] = useState<ChatData | null>(null);
 
-    const[showChatInfo, setShowChatInfo] = useState(false);
-
     const [messageList, setMessageList] = useState<MessageData[]>([]);
+
+    const [showChatInfo, setShowChatInfo] = useState(false);
+    const [showProfileInfo, setShowProfileInfo] = useState(false);
+
 
     const [stompClient, setStompClient] = useState( new Client({
         webSocketFactory: () => new SockJS('http://localhost:8080/ws-connect'),
@@ -58,10 +64,6 @@ export function ChatPage() {
         setActiveChat(chat);
     }
 
-    function onShowChatInfo() {
-        setShowChatInfo(true);
-    }
-
     async function getChatMessages(chatId: string): Promise<MessageData[]> {
         const response = await axiosInstance.get(`http://localhost:8080/chat/${chatId}`);
         if (response.status !== 200) {
@@ -69,6 +71,21 @@ export function ChatPage() {
         }
     
         return response.data;
+    }
+
+    async function getUserInfo(): Promise<UserData | null> {
+        try {
+            const response = await axiosInstance.get('http://localhost:8080/my-info');
+
+            if (response.status !== 200) {
+                throw new Error("Bad server response");
+            }
+    
+            return response.data;
+        } catch (e) {
+            navigate('/login');
+            return null;
+        }
     }
 
     async function getChatList(): Promise<ChatData[]> {
@@ -92,13 +109,18 @@ export function ChatPage() {
             navigate('/login');
             return;
         }
-        getChatList().then(chatList => {
-            setChatList(chatList);
-            setChatListLoaded(true);
-        });
+        (async () => {
+            const user = await getUserInfo();
+            setUser(user);
+            if (user !== null) {
+                const chatList = await getChatList();
+                setChatList(chatList);
+                setChatListLoaded(true);
+            }
+        })();
     }, []);
 
-    if (!chatListLoaded) {
+    if (user === null || !chatListLoaded) {
         return null;
     }
         
@@ -108,17 +130,23 @@ export function ChatPage() {
                     chatList={chatList}
                     activeChatId={activeChat === null ? null : activeChat.id}
                     onChatSelected={onChatSelected}
+                    onShowProfileInfo={() => setShowProfileInfo(true)}
                 />
                 <MessageArea 
                     activeChat={activeChat}
                     messageList={messageList}
                     onSendMessage={onSendMessage}
-                    onShowChatInfo={onShowChatInfo}
+                    onShowChatInfo={() => setShowChatInfo(true)}
                 />
                 <ChatInfo
                     chat={activeChat}
                     show={showChatInfo}
                     onClose={() => setShowChatInfo(false)}
+                />
+                <ProfileInfo
+                    user={user}
+                    show={showProfileInfo}
+                    onClose={() => setShowProfileInfo(false)}
                 />
             </div>
         );

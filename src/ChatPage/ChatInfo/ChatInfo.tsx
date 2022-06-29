@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { BsFillPeopleFill } from 'react-icons/bs';
 import { ChatData } from '../../model/ChatData';
 import { UserData } from '../../model/UserData';
 
@@ -27,13 +28,13 @@ export function ChatInfo(props: {
     const memberWord = (props.chat.members.length === 1) ? 'member' : 'members';
 
     return (
-        <div className='chat-info-background' onClick={props.onClose}>
-            <div className='chat-info' onClick={e => e.stopPropagation()}>
+        <div className='modal-background' onClick={props.onClose}>
+            <div className='modal' onClick={e => e.stopPropagation()}>
                 <div className='chat-info-name'>
                     {props.chat.name}
                 </div>
                 <div className='chat-members-label'>
-                    {`${props.chat.members.length} ${memberWord}`}
+                    <BsFillPeopleFill className='chat-members-icon'/> {`${props.chat.members.length} ${memberWord}`}
                 </div>
                 <ul className='chat-members-list'>
                     {props.chat.members.map(

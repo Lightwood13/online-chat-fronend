@@ -1,25 +1,25 @@
 import React from 'react';
 import { BsFillPersonFill } from 'react-icons/bs';
-import { ChatData } from '../../model/ChatData';
+import { ChatDataWithLastMessage } from '../../model/ChatDataWithLastMessage';
 import { ChatListItem } from './ChatListItem';
 
 export function ChatList(props: {
-    chatList: ChatData[],
+    chatList: ChatDataWithLastMessage[],
     activeChatId: string | null,
-    onChatSelected: (chat: ChatData) => void,
+    onChatSelected: (chatId: string) => void,
     onShowProfileInfo: () => void
 }) {
     return (
         <div className='chat-area'>
-            <ul className='chat-list'>
-            {props.chatList.map( (chat: ChatData) => 
+            <div className='chat-list'>
+            {props.chatList.map( (chat: ChatDataWithLastMessage) => 
                 <ChatListItem 
                     key={chat.id} 
                     data={chat}
                     isActive={chat.id === props.activeChatId}
                     onChatSelected={props.onChatSelected}
                 />)}
-            </ul>
+            </div>
             <div className='profile-button' onClick={props.onShowProfileInfo}>
                 <BsFillPersonFill/> Profile
             </div>

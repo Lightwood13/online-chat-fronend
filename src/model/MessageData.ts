@@ -1,6 +1,7 @@
 export type MessageData = {
     id: string,
-    authorName: string,
+    groupChatId: string,
+    authorId: string,
     text: string
     sentOn: Date
 }

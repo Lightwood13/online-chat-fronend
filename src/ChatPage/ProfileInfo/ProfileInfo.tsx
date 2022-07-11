@@ -1,14 +1,14 @@
 import React, { useEffect } from 'react';
 import { UserData } from '../../model/UserData';
 
+import defaultProfilePhoto from '../../images/default.png';
+import { ProfileHeader } from './ProfileHeader';
+
 export function ProfileInfo(props: {
     user: UserData,
     show: boolean,
     onClose: () => void
 }) {
-    if (!props.show) {
-        return null;
-    }
 
     function closeOnEscapeKeyDown(e: KeyboardEvent) {
         if (e.code === 'Escape') {
@@ -23,12 +23,19 @@ export function ProfileInfo(props: {
         };
     } ,[]);
 
+    if (!props.show) {
+        return null;
+    }
+
     return (
         <div className='modal-background' onClick={props.onClose}>
             <div className='modal' onClick={e => e.stopPropagation()}>
-                <div className='profile-info-name'>
-                    {props.user.name}
-                </div>
+                <ProfileHeader
+                    initialProfilePhotoLocation={props.user.profilePhotoLocation}
+                    defaultProfilePhotoUrl={defaultProfilePhoto}
+                    uploadProfilePhotoUrl={`http://localhost:8080/profile-photo`}
+                    profileName={props.user.name}
+                />
             </div>
         </div>
     );

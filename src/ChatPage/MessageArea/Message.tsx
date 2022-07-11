@@ -1,14 +1,31 @@
 import React from 'react';
 import { MessageData } from '../../model/MessageData';
 
-export const Message = (messageProps: {
-    data: MessageData
+import defaultProfilePhoto from '../../images/default.png';
+import { UserData } from '../../model/UserData';
+
+export const Message = (props: {
+    data: MessageData,
+    author: UserData | undefined
 }) => (
-        <li className='message'>
-            <div className='message-sender'>{messageProps.data.authorName}</div>
-            <div className='message-text'>{messageProps.data.text}</div>
-            <div className='message-senton'>{messageProps.data.sentOn.toLocaleTimeString(
-                [], {hour: '2-digit', minute: '2-digit'}
-            )}</div>
-        </li>
+        <div className='message'>
+            <img
+                className='message-profile-photo'
+                src={ props.author === undefined || props.author.profilePhotoLocation === null
+                     ? defaultProfilePhoto
+                     : `http://localhost:8080/photo/${props.author.profilePhotoLocation}`
+                    }
+            />
+            <div className='message-bubble'>
+                <div className='message-sender'>{
+                    props.author === undefined
+                    ? '[deleted]'
+                    : props.author.name
+                }</div>
+                <div className='message-text'>{props.data.text}</div>
+                <div className='message-senton'>{props.data.sentOn.toLocaleTimeString(
+                    [], {hour: '2-digit', minute: '2-digit'}
+                )}</div>
+            </div>
+        </div>
     );

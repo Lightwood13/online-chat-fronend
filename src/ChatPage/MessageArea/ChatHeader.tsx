@@ -2,12 +2,9 @@ import React from 'react';
 import { ChatData } from '../../model/ChatData';
 
 export function ChatHeader(props: {
-    chat: ChatData | null,
+    chat: ChatData,
     onShowChatInfo: () => void
 }) {
-    if (props.chat === null)
-        return null;
-
     const memberWord = (props.chat.members.length === 1) ? 'member' : 'members';
     return (
         <div className='chat-header' onClick={

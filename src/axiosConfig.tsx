@@ -1,16 +1,18 @@
 import axios from 'axios';
 
+export function parseJSON(s: string): any {
+    if (s.length === 0)
+            return s;
+    return JSON.parse(s, (key: string, value: any) => {
+        if (key === 'sentOn' || key === 'lastMessageSentOn')
+            return new Date(value);
+        else
+            return value;
+    });
+}
+
 export const axiosInstance = axios.create({
-    transformResponse: (response: string) : any => {
-        if (response.length === 0)
-            return response;
-        return JSON.parse(response, (key: string, value: any) => {
-            if (key === 'sentOn')
-                return new Date(value);
-            else
-                return value;
-        });
-    }
+    transformResponse: parseJSON
 });
 
 export function hasJWTToken(): boolean {

@@ -24,15 +24,16 @@ export function ChatPage() {
     const [chatListLoaded, setChatListLoaded] = useState(false);
     const [chatList, setChatList, chatListRef] = useStateRef<ChatDataWithLastMessageAndAuthorName[]>([]);
     const [loadedChats, setLoadedChats, loadedChatsRef] = useStateRef(new Map<string, ChatData>());
-    const [activeChatId, setActiveChatId, activeChatIdRef] = useStateRef<string | null>(null);
+    const [activeChatId, setActiveChatId] = useState<string | null>(null);
 
     const [messageLists, setMessageLists, messageListsRef] = useStateRef(new Map<string, MessageData[]>());
 
     const [showChatInfo, setShowChatInfo] = useState(false);
     const [showProfileInfo, setShowProfileInfo] = useState(false);
 
-    const [activeChatOpenedFirstTime, setActiveChatOpenedFirstTime] = useState(true);
+    const [scrollActiveChatToBottom, setScrollActiveChatToBottom] = useState(true);
     const [activeChatScrollPosition, setActiveChatScrollPosition] = useState(0);
+    const [activeChatScrolledToBottom, setActiveChatScrolledToBottom, activeChatScrolledToBottomRef] = useStateRef(true);
     const [chatsScrollPositions, setChatsScrollPositions] = useState(new Map<string, number>());
 
     const [stompClient, setStompClient] = useState(new Client({
@@ -99,6 +100,8 @@ export function ChatPage() {
             const newMessages = previousMessages.concat([newMessage]);
             setMessageLists(messageLists => new Map(messageLists.set(newMessage.groupChatId, newMessages)));
         }
+
+        setScrollActiveChatToBottom(activeChatScrolledToBottomRef.current);
     }
 
     function onUserProfileUpdated(updatedUser: UserData) {
@@ -143,13 +146,13 @@ export function ChatPage() {
             }
             setUsers(new Map(users));
         }
-        setActiveChatId(chatId);
         if (activeChatId !== null) {
             setChatsScrollPositions(chatsScrollPositions.set(activeChatId, activeChatScrollPosition));
         }
+        setActiveChatId(chatId);
         const savedChatScrollPosition = chatsScrollPositions.get(chatId);
         setActiveChatScrollPosition(savedChatScrollPosition !== undefined ? savedChatScrollPosition : 0);
-        setActiveChatOpenedFirstTime(savedChatScrollPosition === undefined);
+        setScrollActiveChatToBottom(savedChatScrollPosition === undefined);
     }
 
     async function getChatInfoAndMessages(chatId: string): Promise<ChatDataWithMembersAndMessages> {
@@ -258,9 +261,12 @@ export function ChatPage() {
                     activeChat={activeChat}
                     users={users}
                     messageList={activeMessageList}
-                    openedFirstTime={activeChatOpenedFirstTime}
+                    scrollToBottom={scrollActiveChatToBottom}
                     scrollPosition={activeChatScrollPosition}
-                    onScroll={scrollPosition => {setActiveChatScrollPosition(scrollPosition);}}
+                    onScroll={(scrollPosition, scrolledToBottom) => {
+                        setActiveChatScrollPosition(scrollPosition);
+                        setActiveChatScrolledToBottom(scrolledToBottom);
+                    }}
                     onSendMessage={onSendMessage}
                     onShowChatInfo={() => setShowChatInfo(true)}
                 />;

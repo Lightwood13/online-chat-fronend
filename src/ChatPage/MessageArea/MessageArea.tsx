@@ -11,30 +11,43 @@ export function MessageArea (props: {
     activeChat: ChatData,
     users: Map<string, UserData>,
     messageList: MessageData[],
-    openedFirstTime: boolean,
+    scrollToBottom: boolean,
     scrollPosition: number,
-    onScroll: (scrollPosition: number) => void,
+    onScroll: (scrollPosition: number, scrolledToBottom: boolean) => void,
     onSendMessage: (text: string) => void,
     onShowChatInfo: () => void
 }) {
     const messageListRef = useRef<HTMLDivElement | null>(null);
-    const messagesEndRef = useRef<HTMLInputElement | null>(null);
+    const messageListEndRef = useRef<HTMLInputElement | null>(null);
 
 
     function scrollToBottom() {
-        messagesEndRef.current?.scrollIntoView();
+        messageListEndRef.current?.scrollIntoView();
     }
+
+    useEffect(() => {
+        if (messageListRef.current !== null) {
+            messageListRef.current.style.scrollBehavior = 'smooth';
+        }
+    }, [props.messageList]);
+
+    useEffect(() => {
+        if (messageListRef.current !== null) {
+            messageListRef.current.style.scrollBehavior = 'auto';
+        }
+    }, [props.activeChatId]);
 
     useEffect(() => {
         if (messageListRef.current !== null) {
             messageListRef.current.scrollTop = props.scrollPosition;
         }
-    }, [props.scrollPosition]);
+    }, [props.activeChatId, props.messageList]);
+
     useEffect(() => {
-        if (props.openedFirstTime) {
+        if (props.scrollToBottom) {
             scrollToBottom();
         }
-    }, [props.activeChatId]);
+    }, [props.activeChatId, props.messageList]);
 
     if (props.messageList.length === 0) {
         return null;
@@ -46,7 +59,11 @@ export function MessageArea (props: {
             <div 
                 className='message-list'
                 ref={messageListRef}
-                onScroll={e => {props.onScroll(e.currentTarget.scrollTop);}}
+                onScroll={e => {
+                    props.onScroll(
+                        e.currentTarget.scrollTop,
+                        e.currentTarget.offsetHeight + e.currentTarget.scrollTop >= e.currentTarget.scrollHeight
+                    );}}
             >
                 {props.messageList.map( (message: MessageData) => 
                     <Message
@@ -55,7 +72,7 @@ export function MessageArea (props: {
                         author={props.users.get(message.authorId)}
                     />
                 )}
-                <div ref={messagesEndRef}></div>
+                <div ref={messageListEndRef}></div>
             </div>
             <InputArea onSubmit={props.onSendMessage}/>
         </div>

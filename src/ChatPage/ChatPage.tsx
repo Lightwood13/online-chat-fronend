@@ -13,6 +13,7 @@ import { ChatData } from '../model/ChatData';
 import { ProfileInfo } from './ProfileInfo/ProfileInfo';
 import { UserData } from '../model/UserData';
 import { ChatDataWithLastMessage } from '../model/ChatDataWithLastMessage';
+import { ChatDataWithLastMessageAndAuthorName } from '../model/ChatDataWithLastMessageAndAuthorName';
 import { ChatDataWithMembersAndMessages } from '../model/ChatDataWithMembersAndMessages';
 
 
@@ -21,7 +22,7 @@ export function ChatPage() {
     const [userId, setUserId] = useState<string | null>(null);
 
     const [chatListLoaded, setChatListLoaded] = useState(false);
-    const [chatList, setChatList, chatListRef] = useStateRef<ChatDataWithLastMessage[]>([]);
+    const [chatList, setChatList, chatListRef] = useStateRef<ChatDataWithLastMessageAndAuthorName[]>([]);
     const [loadedChats, setLoadedChats, loadedChatsRef] = useStateRef(new Map<string, ChatData>());
     const [activeChatId, setActiveChatId, activeChatIdRef] = useStateRef<string | null>(null);
 
@@ -67,8 +68,32 @@ export function ChatPage() {
         stompClient.activate();
     }, []);
 
-    function onMessageReceived(message: IMessage) {
-        const newMessage = parseJSON(message.body);
+    async function onMessageReceived(message: IMessage) {
+        const newMessage: MessageData = parseJSON(message.body);
+        let usersMap = usersRef.current;
+        if (!usersMap.has(newMessage.authorId)) {
+            const newUser = await getUsersInfo([newMessage.authorId]);
+            const newUsers = new Map(usersMap);
+            for (const user of newUser) {
+                newUsers.set(user.id, user);
+            }
+            usersMap = newUsers;
+            setUsers(newUsers);
+        }
+
+        const chatIndex = chatListRef.current.findIndex(chatData => chatData.id === newMessage.groupChatId);
+        if (chatIndex !== -1) {
+            const newChatList = [...chatListRef.current];
+            newChatList[chatIndex] = {
+                ...newChatList[chatIndex],
+                lastMessageId: newMessage.id,
+                lastMessageAuthorId: newMessage.authorId,
+                lastMessageAuthorName: (x => x ? x.name : '[deleted]')(usersMap.get(newMessage.authorId)),
+                lastMessageText: newMessage.text,
+                lastMessageSentOn: newMessage.sentOn
+            };
+            setChatList(newChatList);
+        }
         const previousMessages = messageListsRef.current.get(newMessage.groupChatId);
         if (previousMessages !== undefined) {
             const newMessages = previousMessages.concat([newMessage]);
@@ -138,7 +163,7 @@ export function ChatPage() {
 
     async function getUserInfo(): Promise<UserData | null> {
         try {
-            const response = await axiosInstance.get('http://localhost:8080/profile-info');
+            const response = await axiosInstance.get('http://localhost:8080/my-profile-info');
 
             if (response.status !== 200) {
                 throw new Error("Bad server response");
@@ -148,6 +173,22 @@ export function ChatPage() {
         } catch (e) {
             navigate('/login');
             return null;
+        }
+    }
+
+    async function getUsersInfo(ids: string[]): Promise<UserData[]> {
+        try {
+            const response = await axiosInstance.get(
+                `http://localhost:8080/profile-info?ids=${ids}`
+            );
+
+            if (response.status !== 200) {
+                throw new Error("Bad server response");
+            }
+    
+            return response.data;
+        } catch (e) {
+            return [];
         }
     }
 
@@ -175,13 +216,25 @@ export function ChatPage() {
         (async () => {
             const user = await getUserInfo();
             if (user === null) {
+                navigate('/login');
                 return;
             }
-            setUsers(new Map(users.set(user.id, user)));
-            setUserId(user.id);
-
             const chatList = await getChatList();
-            setChatList(chatList);
+            const usersArr = await getUsersInfo(chatList.map(chat => chat.lastMessageAuthorId));
+            const usersMap = new Map<string, UserData>();
+            usersMap.set(user.id, user);
+            for (const user of usersArr) {
+                usersMap.set(user.id, user);
+            }
+            const chatListWithAuthorName: ChatDataWithLastMessageAndAuthorName[] =
+                chatList.map(chat => ({
+                    ...chat,
+                    lastMessageAuthorName: (x => x ? x.name : '[deleted]')(usersMap.get(chat.lastMessageAuthorId))
+                }));
+            setUserId(user.id);
+            setUsers(usersMap);
+
+            setChatList(chatListWithAuthorName);
             setChatListLoaded(true);
         })();
     }, []);

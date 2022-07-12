@@ -1,10 +1,10 @@
 import React from 'react';
 import { BsFillPersonFill } from 'react-icons/bs';
-import { ChatDataWithLastMessage } from '../../model/ChatDataWithLastMessage';
+import { ChatDataWithLastMessageAndAuthorName } from '../../model/ChatDataWithLastMessageAndAuthorName';
 import { ChatListItem } from './ChatListItem';
 
 export function ChatList(props: {
-    chatList: ChatDataWithLastMessage[],
+    chatList: ChatDataWithLastMessageAndAuthorName[],
     activeChatId: string | null,
     onChatSelected: (chatId: string) => void,
     onShowProfileInfo: () => void
@@ -12,7 +12,7 @@ export function ChatList(props: {
     return (
         <div className='chat-area'>
             <div className='chat-list'>
-            {props.chatList.map( (chat: ChatDataWithLastMessage) => 
+            {props.chatList.map( (chat: ChatDataWithLastMessageAndAuthorName) => 
                 <ChatListItem 
                     key={chat.id} 
                     data={chat}

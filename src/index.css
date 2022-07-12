@@ -62,9 +62,47 @@ body {
   border-radius: 50%;
 }
 
+.chat-summary {
+  margin-left: 10px;
+  display: flex;
+  flex-grow: 1;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.chat-name-and-date {
+  margin-bottom: 3px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .chat-name {
   font-weight: bold;
-  margin: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chat-last-message-sent-on {
+  font-size: 16px;
+  white-space: nowrap;
+}
+
+.last-message-and-unread-count {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  overflow: hidden;
+}
+
+.last-message {
+  font-size: 16px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .profile-button {

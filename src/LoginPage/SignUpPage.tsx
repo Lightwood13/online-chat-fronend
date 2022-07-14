@@ -1,6 +1,6 @@
 import React, { FormEvent, useState } from 'react';
 import { Link, useNavigate } from "react-router-dom";
-import { updateJWTToken } from '../axiosConfig';
+import { updateJWTToken } from '../network';
 
 export function SignupPage()  {
 

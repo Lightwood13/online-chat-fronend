@@ -1,10 +1,10 @@
-import React, { useRef, useState } from 'react';
-import { axiosInstance } from '../../axiosConfig';
+import React, { useRef } from 'react';
+import { uploadProfilePhoto } from '../../../network';
 
 export function ProfileHeader(props: {
     initialProfilePhotoLocation: string | null
     defaultProfilePhotoUrl: string,
-    uploadProfilePhotoUrl: string,
+    chatId: string | null,
     profileName: string
 }) {
     const profilePhotoUrl = props.initialProfilePhotoLocation !== null
@@ -21,12 +21,7 @@ export function ProfileHeader(props: {
     function onFileChange(e: React.ChangeEvent<HTMLInputElement>) {
         const files = e.target.files;
         if (files !== null && files.length !== 0) {
-            const file = files[0];
-
-            const formData = new FormData();
-
-            formData.append('file', file, file.name);
-            axiosInstance.post(props.uploadProfilePhotoUrl, formData);
+            uploadProfilePhoto(files[0], props.chatId);
         }
     }
 

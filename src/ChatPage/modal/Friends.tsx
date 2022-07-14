@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react';
+import { BsFillPeopleFill } from 'react-icons/bs';
 import { UserData } from '../../model/UserData';
 
 import defaultProfilePhoto from '../../images/default.png';
-import { ProfileHeader } from './ProfileHeader';
+import { UserList } from './UserList';
 
-export function ProfileInfo(props: {
-    user: UserData,
+export function Friends(props: {
+    friends: UserData[],
     show: boolean,
     onClose: () => void
 }) {
@@ -30,12 +31,8 @@ export function ProfileInfo(props: {
     return (
         <div className='modal-background' onClick={props.onClose}>
             <div className='modal' onClick={e => e.stopPropagation()}>
-                <ProfileHeader
-                    initialProfilePhotoLocation={props.user.profilePhotoLocation}
-                    defaultProfilePhotoUrl={defaultProfilePhoto}
-                    uploadProfilePhotoUrl={`http://localhost:8080/profile-photo`}
-                    profileName={props.user.name}
-                />
+                <div className='friends-label'>Friends</div>
+                <UserList users={props.friends}/>
             </div>
         </div>
     );

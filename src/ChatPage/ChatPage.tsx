@@ -4,21 +4,21 @@ import { Client, IMessage } from '@stomp/stompjs';
 import { useEffect, useState } from 'react';
 import useStateRef from 'react-usestateref';
 import { useNavigate } from 'react-router-dom';
-import { axiosInstance, getJWTToken, hasJWTToken, parseJSON } from '../axiosConfig';
+import { getChatInfoAndMessages, getChatList, getFriends, getJWTToken, getUserInfo, getUsersInfo, hasJWTToken, parseJSON, sendMessage } from '../network';
 import { ChatList } from './ChatList/ChatList';
 import { MessageArea } from './MessageArea/MessageArea';
-import { ChatInfo } from './ChatInfo/ChatInfo';
+import { ChatInfo } from './modal/ChatInfo';
 import { MessageData } from '../model/MessageData';
 import { ChatData } from '../model/ChatData';
-import { ProfileInfo } from './ProfileInfo/ProfileInfo';
+import { ProfileInfo } from './modal/ProfileInfo/ProfileInfo';
 import { UserData } from '../model/UserData';
-import { ChatDataWithLastMessage } from '../model/ChatDataWithLastMessage';
 import { ChatDataWithLastMessageAndAuthorName } from '../model/ChatDataWithLastMessageAndAuthorName';
-import { ChatDataWithMembersAndMessages } from '../model/ChatDataWithMembersAndMessages';
+import { Friends } from './modal/Friends';
 
 
 export function ChatPage() {
     const [users, setUsers, usersRef] = useStateRef(new Map<string, UserData>());
+    const [friends, setFriends] = useState<UserData[]>([]);
     const [userId, setUserId] = useState<string | null>(null);
 
     const [chatListLoaded, setChatListLoaded] = useState(false);
@@ -30,6 +30,7 @@ export function ChatPage() {
 
     const [showChatInfo, setShowChatInfo] = useState(false);
     const [showProfileInfo, setShowProfileInfo] = useState(false);
+    const [showFriends, setShowFriends] = useState(false);
 
     const [scrollActiveChatToBottom, setScrollActiveChatToBottom] = useState(true);
     const [activeChatScrollPosition, setActiveChatScrollPosition] = useState(0);
@@ -124,10 +125,7 @@ export function ChatPage() {
 
     function onSendMessage(text: string) {
         if (activeChatId !== null) {
-            axiosInstance.post('http://localhost:8080/send', {
-                groupChatId: activeChatId,
-                text: text
-            });
+            sendMessage(activeChatId, text);
         }
     }
 
@@ -155,60 +153,13 @@ export function ChatPage() {
         setScrollActiveChatToBottom(savedChatScrollPosition === undefined);
     }
 
-    async function getChatInfoAndMessages(chatId: string): Promise<ChatDataWithMembersAndMessages> {
-        const response = await axiosInstance.get(`http://localhost:8080/chat/${chatId}`);
-        if (response.status !== 200) {
-            throw new Error("Bad server response");
-        }
-    
-        return response.data;
+    async function onShowFriends() {
+        const friends = await getFriends();
+        setFriends(friends);
+        setShowFriends(true);
     }
 
-    async function getUserInfo(): Promise<UserData | null> {
-        try {
-            const response = await axiosInstance.get('http://localhost:8080/my-profile-info');
-
-            if (response.status !== 200) {
-                throw new Error("Bad server response");
-            }
-    
-            return response.data;
-        } catch (e) {
-            navigate('/login');
-            return null;
-        }
-    }
-
-    async function getUsersInfo(ids: string[]): Promise<UserData[]> {
-        try {
-            const response = await axiosInstance.get(
-                `http://localhost:8080/profile-info?ids=${ids}`
-            );
-
-            if (response.status !== 200) {
-                throw new Error("Bad server response");
-            }
-    
-            return response.data;
-        } catch (e) {
-            return [];
-        }
-    }
-
-    async function getChatList(): Promise<ChatDataWithLastMessage[]> {
-        try {
-            const response = await axiosInstance.get('http://localhost:8080/chats');
-
-            if (response.status !== 200) {
-                throw new Error("Bad server response");
-            }
-    
-            return response.data;
-        } catch (e) {
-            navigate('/login');
-            return [];
-        }
-    }
+   
 
     const navigate = useNavigate();
     useEffect(() => {
@@ -288,6 +239,7 @@ export function ChatPage() {
                     activeChatId={activeChatId}
                     onChatSelected={onChatSelected}
                     onShowProfileInfo={() => setShowProfileInfo(true)}
+                    onShowFriends={onShowFriends}
                 />
                 {messageArea}
                 {chatInfo}
@@ -295,6 +247,11 @@ export function ChatPage() {
                     user={user}
                     show={showProfileInfo}
                     onClose={() => setShowProfileInfo(false)}
+                />
+                <Friends
+                    friends={friends}
+                    show={showFriends}
+                    onClose={() => setShowFriends(false)}
                 />
             </div>
         );

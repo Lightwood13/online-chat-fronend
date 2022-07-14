@@ -48,6 +48,10 @@ export const getChatList = async() =>
 export const getFriends = async() =>
     get<UserData[]>(`${serverUrl}/my-friends`, []);
 
+export const removeFriend = async(friendId: string) => {
+    await axiosInstance.post(`${serverUrl}/remove-friend/${friendId}`);
+};
+
 export function sendMessage(groupChatId: string, text: string) {
     axiosInstance.post(`${serverUrl}/send`, {
                 groupChatId: groupChatId,

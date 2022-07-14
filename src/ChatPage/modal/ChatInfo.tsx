@@ -46,9 +46,12 @@ export function ChatInfo(props: {
                     <div className='chat-members-label'>
                         <BsFillPeopleFill className='chat-members-icon'/> {`${props.chat.members.length} ${memberWord}`}
                     </div>
-                    <UserList users={props.chat.members
+                    <UserList
+                        users={props.chat.members
                                 .map(userId => props.users.get(userId))
                                 .filter((e): e is UserData => e !== undefined)}
+                        showRemoveButton={false}
+                        onRemove={() => {0;}}
                     />
                 </div>
             </div>

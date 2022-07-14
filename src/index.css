@@ -8,6 +8,16 @@ body {
   margin: 0;
 }
 
+button {
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:active {
+  transform: scale(0.95);
+}
+
 #root {
   height: 100vh;
 }
@@ -282,6 +292,46 @@ input {
   overflow-y: auto;
 }
 
+.dialog {
+  min-width: 600px;
+  min-height: 200px;
+  width: 40%;
+  height: 25%;
+  background-color: white;
+  border-radius: 10px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.dialog-title {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.dialog-buttons {
+  display: flex;
+  flex-direction: row;
+}
+
+.dialog-button-yes, .dialog-button-no {
+  font-size: 20px;
+  margin-left: 10px;
+  margin-right: 10px;
+  padding: 10px
+}
+
+.dialog-button-no {
+  background-color: cornflowerblue;
+  color: white;
+}
+
+.dialog-button-no:hover {
+  background-color: rgb(44, 95, 189);
+}
+
 .chat-info-name, .profile-info-name {
   font-weight: bold;
   font-size: 24px;
@@ -306,6 +356,7 @@ input {
   margin: 20px;
   display: flex;
   flex-direction: row;
+  align-items: center;
 }
 
 .user-list-item-name {
@@ -314,6 +365,14 @@ input {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.user-list-item-remove-button {
+  background-color: red;
+  color: white;
+  margin-left: auto;
+  padding: 5px;
+  height: fit-content;
 }
 
 .profile-info-photo-and-name {

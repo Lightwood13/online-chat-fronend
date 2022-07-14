@@ -4,7 +4,9 @@ import { UserData } from '../../model/UserData';
 import defaultProfilePhoto from '../../images/default.png';
 
 export const UserList = (props: {
-    users: UserData[]
+    users: UserData[],
+    showRemoveButton: boolean,
+    onRemove: (userId: string) => void
 }) => (
     <div className='user-list'>
         {props.users.map(
@@ -19,6 +21,12 @@ export const UserList = (props: {
                         <div className='user-list-item-name'>{
                             user === undefined ? '[deleted]' : user.name
                         }</div>
+                        {props.showRemoveButton &&
+                            <button 
+                                className='user-list-item-remove-button'
+                                onClick={() => props.onRemove(user.id)}
+                            >Remove</button>
+                        }
                     </div>
                 );
             }

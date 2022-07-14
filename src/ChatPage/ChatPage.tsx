@@ -159,8 +159,6 @@ export function ChatPage() {
         setShowFriends(true);
     }
 
-   
-
     const navigate = useNavigate();
     useEffect(() => {
         if (!hasJWTToken()) {
@@ -252,6 +250,7 @@ export function ChatPage() {
                     friends={friends}
                     show={showFriends}
                     onClose={() => setShowFriends(false)}
+                    onFriendRemoved={onShowFriends}
                 />
             </div>
         );

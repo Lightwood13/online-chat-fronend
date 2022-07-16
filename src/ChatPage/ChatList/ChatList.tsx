@@ -6,6 +6,7 @@ import { ChatListItem } from './ChatListItem';
 export function ChatList(props: {
     chatList: ChatDataWithLastMessageAndAuthorName[],
     activeChatId: string | null,
+    friendRequestCount: number,
     onChatSelected: (chatId: string) => void,
     onShowFriends: () => void,
     onShowProfileInfo: () => void
@@ -22,7 +23,12 @@ export function ChatList(props: {
                 />)}
             </div>
             <div className='friend-button' onClick={props.onShowFriends}>
-                <BsFillPeopleFill/> Friends
+                <div className='friend-label'>
+                    <BsFillPeopleFill/> Friends
+                </div>
+                { props.friendRequestCount === 0 ? null :
+                    <div className='friend-request-count'>{props.friendRequestCount}</div>
+                }
             </div>
             <div className='profile-button' onClick={props.onShowProfileInfo}>
                 <BsFillPersonFill/> Profile

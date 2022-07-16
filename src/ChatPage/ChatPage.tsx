@@ -4,7 +4,7 @@ import { Client, IMessage } from '@stomp/stompjs';
 import { useEffect, useState } from 'react';
 import useStateRef from 'react-usestateref';
 import { useNavigate } from 'react-router-dom';
-import { getChatInfoAndMessages, getChatList, getFriends, getJWTToken, getUserInfo, getUsersInfo, hasJWTToken, parseJSON, sendMessage } from '../network';
+import { getChatInfoAndMessages, getChatList, getFriendRequests, getFriends, getJWTToken, getUserInfo, getUsersInfo, hasJWTToken, parseJSON, sendMessage } from '../network';
 import { ChatList } from './ChatList/ChatList';
 import { MessageArea } from './MessageArea/MessageArea';
 import { ChatInfo } from './modal/ChatInfo';
@@ -13,12 +13,13 @@ import { ChatData } from '../model/ChatData';
 import { ProfileInfo } from './modal/ProfileInfo/ProfileInfo';
 import { UserData } from '../model/UserData';
 import { ChatDataWithLastMessageAndAuthorName } from '../model/ChatDataWithLastMessageAndAuthorName';
-import { Friends } from './modal/Friends';
+import { Friends } from './modal/Friends/Friends';
 
 
 export function ChatPage() {
     const [users, setUsers, usersRef] = useStateRef(new Map<string, UserData>());
     const [friends, setFriends] = useState<UserData[]>([]);
+    const [friendRequests, setFriendRequests] = useState<UserData[]>([]);
     const [userId, setUserId] = useState<string | null>(null);
 
     const [chatListLoaded, setChatListLoaded] = useState(false);
@@ -62,6 +63,9 @@ export function ChatPage() {
             });
             stompClient.subscribe(`/user/${userId}/group-chat-profile-updates`, (message: IMessage) => {
                 onChatProfileUpdated(JSON.parse(message.body));
+            });
+            stompClient.subscribe(`/user/${userId}/friend-list-updates`, (message: IMessage) => {
+                onFriendListUpdated();
             });
         }
     }, [stompConnected, userId]);
@@ -153,9 +157,15 @@ export function ChatPage() {
         setScrollActiveChatToBottom(savedChatScrollPosition === undefined);
     }
 
-    async function onShowFriends() {
+    async function onFriendListUpdated() {
         const friends = await getFriends();
+        const friendRequests = await getFriendRequests();
         setFriends(friends);
+        setFriendRequests(friendRequests);
+    }
+
+    async function onShowFriends() {
+        await onFriendListUpdated();
         setShowFriends(true);
     }
 
@@ -173,6 +183,7 @@ export function ChatPage() {
             }
             const chatList = await getChatList();
             const usersArr = await getUsersInfo(chatList.map(chat => chat.lastMessageAuthorId));
+            await onFriendListUpdated();
             const usersMap = new Map<string, UserData>();
             usersMap.set(user.id, user);
             for (const user of usersArr) {
@@ -199,8 +210,8 @@ export function ChatPage() {
         return null;
     }
 
-    let messageArea: ReactElement | false = false;
-    let chatInfo: ReactElement | false = false;
+    let messageArea: ReactElement | null = null;
+    let chatInfo: ReactElement | null = null;
     if (activeChatId !== null) {
         const activeChat = loadedChats.get(activeChatId);
         const activeMessageList = messageLists.get(activeChatId);
@@ -235,6 +246,7 @@ export function ChatPage() {
                 <ChatList 
                     chatList={chatList}
                     activeChatId={activeChatId}
+                    friendRequestCount={friendRequests.length}
                     onChatSelected={onChatSelected}
                     onShowProfileInfo={() => setShowProfileInfo(true)}
                     onShowFriends={onShowFriends}
@@ -248,9 +260,11 @@ export function ChatPage() {
                 />
                 <Friends
                     friends={friends}
+                    friendRequests={friendRequests}
                     show={showFriends}
                     onClose={() => setShowFriends(false)}
-                    onFriendRemoved={onShowFriends}
+                    onFriendRemoved={onFriendListUpdated}
+                    onFriendRequestResolved={onFriendListUpdated}
                 />
             </div>
         );

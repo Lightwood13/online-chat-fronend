@@ -1,4 +1,4 @@
-import React, { ChangeEvent, FormEvent, useState } from 'react';
+import React, { FormEvent, useState } from 'react';
 
 
 export function InputArea (props: {
@@ -13,7 +13,7 @@ export function InputArea (props: {
     };
 
     return (
-        <form className='input-area' onSubmit={handleSubmit}>
+        <form className='new-message-input-area' onSubmit={handleSubmit}>
             <input 
                 className='input-field' 
                 value={inputValue}

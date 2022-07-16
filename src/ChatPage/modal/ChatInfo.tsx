@@ -50,8 +50,6 @@ export function ChatInfo(props: {
                         users={props.chat.members
                                 .map(userId => props.users.get(userId))
                                 .filter((e): e is UserData => e !== undefined)}
-                        showRemoveButton={false}
-                        onRemove={() => {0;}}
                     />
                 </div>
             </div>

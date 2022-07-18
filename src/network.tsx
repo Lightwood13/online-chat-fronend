@@ -1,6 +1,7 @@
 import axios, { AxiosResponse } from 'axios';
+import { ChatData } from './model/ChatData';
 import { ChatDataWithLastMessage } from './model/ChatDataWithLastMessage';
-import { ChatDataWithMembersAndMessages } from './model/ChatDataWithMembersAndMessages';
+import { MessageData } from './model/MessageData';
 import { UserData } from './model/UserData';
 
 const serverUrl = 'http://localhost:8080';
@@ -11,7 +12,6 @@ const axiosInstance = axios.create({
 
 async function getOrThrow<ReturnType>(url: string): Promise<ReturnType> {
     const response = await axiosInstance.get(url);
-
     return response.data;
 }
 
@@ -24,8 +24,11 @@ async function get<ReturnType>(url: string, defaultValue: ReturnType): Promise<R
     }
 }
 
-export const getChatInfoAndMessages = async (chatId: string) => 
-    getOrThrow<ChatDataWithMembersAndMessages>(`${serverUrl}/chat/${chatId}`);
+export const getChatInfo = async (chatId: string) => 
+    getOrThrow<ChatData>(`${serverUrl}/chat/info/${chatId}`);
+
+export const getChatMessages = async (chatId: string) => 
+    getOrThrow<MessageData[]>(`${serverUrl}/chat/messages/${chatId}`);
 
 export const getUserInfo = async () =>
     get<UserData | null>(`${serverUrl}/my-profile-info`, null);
@@ -69,15 +72,24 @@ export function uploadProfilePhoto(file: File, chatId: string | null) {
     const formData = new FormData();
     formData.append('file', file, file.name);
     const url = chatId === null ? `${serverUrl}/profile-photo`
-        : `${serverUrl}/group-chat-profile-photo/${chatId}`;
+        : `${serverUrl}/chat/profile-photo/${chatId}`;
     axiosInstance.post(url, formData);
 }
+
+export function createNewGroup(name: string, members: string[]) {
+    axiosInstance.post(`${serverUrl}/chat/create`, {
+            name: name,
+            members: members
+        });
+}
+
+const dateFields = new Set(['sentOn', 'lastMessageSentOn', 'createdOn', 'timestamp']);
 
 export function parseJSON(s: string): any {
     if (s.length === 0)
             return s;
     return JSON.parse(s, (key: string, value: any) => {
-        if (key === 'sentOn' || key === 'lastMessageSentOn' || key === 'timestamp')
+        if (dateFields.has(key) && value !== null)
             return new Date(value);
         else
             return value;

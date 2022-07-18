@@ -19,3 +19,20 @@ export const UserListItem = (props: {
         {props.children}
     </div>
 );
+
+export const UserListItemWithLeftContent = (props: {
+    user: UserData,
+    children?: ReactNode
+}) => (
+    <div className='user-list-item' key={props.user.id}>
+        {props.children}
+        <img className='message-profile-photo' src={
+            props.user === undefined || props.user.profilePhotoLocation === null
+            ? defaultProfilePhoto
+            : `http://localhost:8080/photo/${props.user.profilePhotoLocation}`
+        }/>
+        <div className='user-list-item-name'>{
+            props.user === undefined ? '[deleted]' : props.user.name
+        }</div>
+    </div>
+);

@@ -2,22 +2,21 @@ import React, { FormEvent, useState } from 'react';
 
 
 export function InputArea (props: {
-    onSubmit: (text: string) => void 
+    inputValue: string,
+    onInputValueChange: (value: string) => void,
+    onSubmit: () => void
 }) {
-    const [inputValue, setInputValue] = useState('');
-
     const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        props.onSubmit(inputValue);
-        setInputValue('');
+        props.onSubmit();
     };
 
     return (
         <form className='new-message-input-area' onSubmit={handleSubmit}>
             <input 
                 className='input-field' 
-                value={inputValue}
-                onChange={e => setInputValue(e.target.value)}
+                value={props.inputValue}
+                onChange={e => props.onInputValueChange(e.target.value)}
             />
             <button className='send-button'>Send</button>
         </form>

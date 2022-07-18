@@ -48,7 +48,7 @@ export function ChatInfo(props: {
                     </div>
                     <UserList
                         users={props.chat.members
-                                .map(userId => props.users.get(userId))
+                                .map(userId => props.users.get(userId.id))
                                 .filter((e): e is UserData => e !== undefined)}
                     />
                 </div>

@@ -119,10 +119,16 @@ svg {
   text-overflow: ellipsis;
 }
 
-.friend-button {
+.new-group-button {
   margin-top: auto;
+}
+
+.new-group-button, .friend-button, .profile-button {
   padding: 10px;
   cursor: pointer;
+}
+
+.friend-button {
   display: flex;
   flex-direction: row;
 }
@@ -145,11 +151,6 @@ svg {
   flex-direction: row;
   justify-content: center;
   align-items: center;
-}
-
-.profile-button {
-  padding: 10px;
-  cursor: pointer;
 }
 
 .message-area {
@@ -227,7 +228,7 @@ svg {
   text-align: right;
 }
 
-.new-message-input-area, .add-friend-input-area {
+.new-message-input-area, .add-friend-input-area, .new-group-name-input-area {
   flex: 0 1 auto;
   display: flex;
   flex-direction: row;
@@ -238,7 +239,7 @@ svg {
   background-color: #daeaf1;
 }
 
-.add-friend-input-area {
+.add-friend-input-area, .new-group-name-input-area {
   margin-left: 10px;
   margin-right: 5px;
 }
@@ -319,10 +320,12 @@ input {
 .modal {
   width: 30%;
   min-width: 400px;
-  height: 80%;
+  max-height: 80%;
   background-color: white;
   border-radius: 10px;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .dialog {
@@ -456,4 +459,26 @@ input {
   font-size: 18px;
   background-color: cornflowerblue;
   color: white;
+}
+
+.create-group-title {
+  margin: 10px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.new-group-choose-members-checkbox {
+  margin-right: 20px;
+  transform: scale(1.5);
+}
+
+.new-group-create-button {
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 10px;
+  padding: 10px;
+  font-size: 18px;
+  color: white;
+  background-color: cornflowerblue;
 }

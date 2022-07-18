@@ -13,8 +13,10 @@ export function MessageArea (props: {
     messageList: MessageData[],
     scrollToBottom: boolean,
     scrollPosition: number,
+    inputValue: string,
     onScroll: (scrollPosition: number, scrolledToBottom: boolean) => void,
-    onSendMessage: (text: string) => void,
+    onInputValueChange: (value: string) => void,
+    onSendMessage: () => void,
     onShowChatInfo: () => void
 }) {
     const messageListRef = useRef<HTMLDivElement | null>(null);
@@ -49,10 +51,6 @@ export function MessageArea (props: {
         }
     }, [props.activeChatId, props.messageList]);
 
-    if (props.messageList.length === 0) {
-        return null;
-    }
-
     return (
         <div className='message-area'>
             <ChatHeader chat={props.activeChat} onShowChatInfo={props.onShowChatInfo}/>
@@ -74,7 +72,11 @@ export function MessageArea (props: {
                 )}
                 <div ref={messageListEndRef}></div>
             </div>
-            <InputArea onSubmit={props.onSendMessage}/>
+            <InputArea
+                inputValue={props.inputValue}
+                onInputValueChange={props.onInputValueChange}
+                onSubmit={props.onSendMessage}
+            />
         </div>
     );
 }

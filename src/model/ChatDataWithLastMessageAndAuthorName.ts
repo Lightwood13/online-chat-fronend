@@ -2,9 +2,10 @@ export type ChatDataWithLastMessageAndAuthorName = {
     id: string,
     name: string,
     profilePhotoLocation: string | null,
-    lastMessageId: string,
-    lastMessageAuthorId: string,
-    lastMessageAuthorName: string,
-    lastMessageText: string,
-    lastMessageSentOn: Date
+    createdOn: Date,
+    lastMessageId: string | null,
+    lastMessageAuthorId: string | null,
+    lastMessageAuthorName: string | null,
+    lastMessageText: string | null,
+    lastMessageSentOn: Date | null
 }

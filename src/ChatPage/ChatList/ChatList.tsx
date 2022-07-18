@@ -1,5 +1,5 @@
 import React from 'react';
-import { BsFillPersonFill, BsFillPeopleFill } from 'react-icons/bs';
+import {  BsFilePersonFill, BsFillPeopleFill, BsPersonCircle } from 'react-icons/bs';
 import { ChatDataWithLastMessageAndAuthorName } from '../../model/ChatDataWithLastMessageAndAuthorName';
 import { ChatListItem } from './ChatListItem';
 
@@ -8,6 +8,7 @@ export function ChatList(props: {
     activeChatId: string | null,
     friendRequestCount: number,
     onChatSelected: (chatId: string) => void,
+    onCreateNewGroup: () => void,
     onShowFriends: () => void,
     onShowProfileInfo: () => void
 }) {
@@ -22,16 +23,19 @@ export function ChatList(props: {
                     onChatSelected={props.onChatSelected}
                 />)}
             </div>
+            <div className='new-group-button' onClick={props.onCreateNewGroup}>
+                <BsFillPeopleFill/> Create new group
+            </div>
             <div className='friend-button' onClick={props.onShowFriends}>
                 <div className='friend-label'>
-                    <BsFillPeopleFill/> Friends
+                    <BsFilePersonFill/> Friends
                 </div>
                 { props.friendRequestCount === 0 ? null :
                     <div className='friend-request-count'>{props.friendRequestCount}</div>
                 }
             </div>
             <div className='profile-button' onClick={props.onShowProfileInfo}>
-                <BsFillPersonFill/> Profile
+                <BsPersonCircle/> Profile
             </div>
         </div>
     );

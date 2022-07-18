@@ -4,7 +4,7 @@ import { Client, IMessage } from '@stomp/stompjs';
 import { useEffect, useState } from 'react';
 import useStateRef from 'react-usestateref';
 import { useNavigate } from 'react-router-dom';
-import { getChatInfoAndMessages, getChatList, getFriendRequests, getFriends, getJWTToken, getUserInfo, getUsersInfo, hasJWTToken, parseJSON, sendMessage } from '../network';
+import { createNewGroup, getChatInfo, getChatList, getChatMessages, getFriendRequests, getFriends, getJWTToken, getUserInfo, getUsersInfo, hasJWTToken, parseJSON, sendMessage } from '../network';
 import { ChatList } from './ChatList/ChatList';
 import { MessageArea } from './MessageArea/MessageArea';
 import { ChatInfo } from './modal/ChatInfo';
@@ -14,6 +14,7 @@ import { ProfileInfo } from './modal/ProfileInfo/ProfileInfo';
 import { UserData } from '../model/UserData';
 import { ChatDataWithLastMessageAndAuthorName } from '../model/ChatDataWithLastMessageAndAuthorName';
 import { Friends } from './modal/Friends/Friends';
+import { NewGroup } from './modal/NewGroup/NewGroup';
 
 
 export function ChatPage() {
@@ -32,11 +33,14 @@ export function ChatPage() {
     const [showChatInfo, setShowChatInfo] = useState(false);
     const [showProfileInfo, setShowProfileInfo] = useState(false);
     const [showFriends, setShowFriends] = useState(false);
+    const [showCreateNewGroup, setShowCreateNewGroup] = useState(false);
 
     const [scrollActiveChatToBottom, setScrollActiveChatToBottom] = useState(true);
     const [activeChatScrollPosition, setActiveChatScrollPosition] = useState(0);
     const [activeChatScrolledToBottom, setActiveChatScrolledToBottom, activeChatScrolledToBottomRef] = useStateRef(true);
+    const [activeChatInput, setActiveChatInput] = useState('');
     const [chatsScrollPositions, setChatsScrollPositions] = useState(new Map<string, number>());
+    const [chatsSavedInput, setChatsSavedInput] = useState(new Map<string, string>());
 
     const [stompClient, setStompClient] = useState(new Client({
         webSocketFactory: () => new SockJS('http://localhost:8080/ws-connect'),
@@ -59,10 +63,10 @@ export function ChatPage() {
 
             stompClient.subscribe('/messages/new', onMessageReceived);
             stompClient.subscribe(`/user/${userId}/profile-updates`, (message: IMessage) => {
-                onUserProfileUpdated(JSON.parse(message.body));
+                onUserProfileUpdated(parseJSON(message.body));
             });
             stompClient.subscribe(`/user/${userId}/group-chat-profile-updates`, (message: IMessage) => {
-                onChatProfileUpdated(JSON.parse(message.body));
+                onChatProfileUpdated(parseJSON(message.body));
             });
             stompClient.subscribe(`/user/${userId}/friend-list-updates`, (message: IMessage) => {
                 onFriendListUpdated();
@@ -120,40 +124,54 @@ export function ChatPage() {
         const updatedChatIndex = updatedChatList.findIndex(chat => chat.id === updatedChat.id);
         if (updatedChatIndex !== -1) {
             updatedChatList[updatedChatIndex] = {...updatedChatList[updatedChatIndex], ...updatedChat};
-            setChatList(updatedChatList);
+        } else {
+            updatedChatList.push({
+                ...updatedChat,
+                lastMessageId: null,
+                lastMessageAuthorId: null,
+                lastMessageAuthorName: null,
+                lastMessageSentOn: null,
+                lastMessageText: null
+            });
         }
+        setChatList(updatedChatList);
         if (loadedChatsRef.current.has(updatedChat.id)) {
             setLoadedChats(loadedChats => new Map(loadedChats.set(updatedChat.id, updatedChat)));
         }
     }
 
-    function onSendMessage(text: string) {
-        if (activeChatId !== null) {
-            sendMessage(activeChatId, text);
+    function onSendMessage() {
+        if (activeChatId !== null && activeChatInput.trim().length !== 0) {
+            sendMessage(activeChatId, activeChatInput.trim());
         }
     }
 
     async function onChatSelected(chatId: string) {
         if (!messageLists.has(chatId)) {
-            const chatInfoWithMessages = await getChatInfoAndMessages(chatId);
-            setMessageLists(new Map(messageLists.set(chatId, chatInfoWithMessages.messages)));
-            setLoadedChats(new Map(loadedChats.set(chatId, {
-                id: chatInfoWithMessages.id,
-                name: chatInfoWithMessages.name,
-                profilePhotoLocation: chatInfoWithMessages.profilePhotoLocation,
-                members: chatInfoWithMessages.members.map(user => user.id)
-            })));
-            for (const member of chatInfoWithMessages.members) {
-                users.set(member.id, member);
+            const chatInfo = await getChatInfo(chatId);
+            const chatMessages = await getChatMessages(chatId);
+
+            const missingMembers = chatInfo.members.filter(m => !users.has(m.id));
+            if (missingMembers.length !== 0) {
+                const members = await getUsersInfo(missingMembers.map(m => m.id));
+                for (const member of members) {
+                    users.set(member.id, member);
+                }
+                setUsers(new Map(users));
             }
-            setUsers(new Map(users));
+
+            setMessageLists(new Map(messageLists.set(chatId, chatMessages)));
+            setLoadedChats(new Map(loadedChats.set(chatId, chatInfo)));
         }
         if (activeChatId !== null) {
             setChatsScrollPositions(chatsScrollPositions.set(activeChatId, activeChatScrollPosition));
+            setChatsSavedInput(chatsSavedInput.set(activeChatId, activeChatInput));
         }
         setActiveChatId(chatId);
         const savedChatScrollPosition = chatsScrollPositions.get(chatId);
+        const savedChatInput = chatsSavedInput.get(chatId);
         setActiveChatScrollPosition(savedChatScrollPosition !== undefined ? savedChatScrollPosition : 0);
+        setActiveChatInput(savedChatInput !== undefined ? savedChatInput : '');
         setScrollActiveChatToBottom(savedChatScrollPosition === undefined);
     }
 
@@ -167,6 +185,11 @@ export function ChatPage() {
     async function onShowFriends() {
         await onFriendListUpdated();
         setShowFriends(true);
+    }
+
+    async function onCreateGroup(name: string, members: string[]) {
+        await createNewGroup(name, members);
+        setShowCreateNewGroup(false);
     }
 
     const navigate = useNavigate();
@@ -202,6 +225,16 @@ export function ChatPage() {
         })();
     }, []);
 
+    useEffect(() => {
+        const chatListCopy = [...chatList];
+        chatListCopy.sort((a, b) =>
+            (b.lastMessageSentOn !== null ? b.lastMessageSentOn : b.createdOn).getTime() -
+            (a.lastMessageSentOn !== null ? a.lastMessageSentOn : a.createdOn).getTime());
+        if (!chatList.every((v, i) => v === chatListCopy[i])) {
+            setChatList(chatListCopy);
+        }
+    }, [chatList]);
+
     if (userId === null || !chatListLoaded) {
         return null;
     }
@@ -227,6 +260,8 @@ export function ChatPage() {
                         setActiveChatScrollPosition(scrollPosition);
                         setActiveChatScrolledToBottom(scrolledToBottom);
                     }}
+                    inputValue={activeChatInput}
+                    onInputValueChange={value => setActiveChatInput(value)}
                     onSendMessage={onSendMessage}
                     onShowChatInfo={() => setShowChatInfo(true)}
                 />;
@@ -248,6 +283,7 @@ export function ChatPage() {
                     activeChatId={activeChatId}
                     friendRequestCount={friendRequests.length}
                     onChatSelected={onChatSelected}
+                    onCreateNewGroup={() => setShowCreateNewGroup(true)}
                     onShowProfileInfo={() => setShowProfileInfo(true)}
                     onShowFriends={onShowFriends}
                 />
@@ -265,6 +301,13 @@ export function ChatPage() {
                     onClose={() => setShowFriends(false)}
                     onFriendRemoved={onFriendListUpdated}
                     onFriendRequestResolved={onFriendListUpdated}
+                />
+                <NewGroup
+                    user={user}
+                    friends={friends}
+                    show={showCreateNewGroup}
+                    onClose={() => setShowCreateNewGroup(false)}
+                    onCreateGroup={onCreateGroup}
                 />
             </div>
         );

@@ -30,15 +30,19 @@ export const ChatListItem = (props: {
         <div className='chat-summary'>
             <div className='chat-name-and-date'>
                 <div className='chat-name'>{props.data.name}</div>
-                <div className='chat-last-message-sent-on'>
-                    {formatDate(props.data.lastMessageSentOn)}
-                </div>
+                { (props.data.lastMessageSentOn || props.data.createdOn) &&
+                    <div className='chat-last-message-sent-on'>
+                        {formatDate(props.data.lastMessageSentOn || props.data.createdOn)}
+                    </div>
+                }
             </div>
-            <div className='last-message-and-unread-count'>
-                <div className='last-message'>
-                    {props.data.lastMessageAuthorName}: {props.data.lastMessageText}
+            { props.data.lastMessageAuthorName && props.data.lastMessageText &&
+                <div className='last-message-and-unread-count'>
+                    <div className='last-message'>
+                        {props.data.lastMessageAuthorName}: {props.data.lastMessageText}
+                    </div>
                 </div>
-            </div>
+            }
         </div>
     </div>
 );

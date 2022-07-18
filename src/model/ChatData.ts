@@ -1,6 +1,9 @@
+import { MemberData } from "./MemberData";
+
 export type ChatData = {
     id: string,
     name: string,
     profilePhotoLocation: string | null,
-    members: string[]
+    createdOn: Date,
+    members: MemberData[]
 }

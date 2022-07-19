@@ -345,6 +345,7 @@ input {
 .dialog-title {
   font-size: 22px;
   font-weight: bold;
+  margin-bottom: 10px;
 }
 
 .dialog-buttons {
@@ -384,6 +385,12 @@ input {
   font-weight: bold;
 }
 
+.chat-member-role {
+  margin-left: 10px;
+  font-size: 16px;
+  color: gray;
+}
+
 .add-friend-info {
   margin-left: 5px;
   font-size: 16px;
@@ -391,6 +398,49 @@ input {
 
 .chat-members-icon {
   margin-right: 10px;
+}
+
+.chat-member-remove-promote-buttons {
+  margin-left: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-member-promote-button, .chat-member-demote-button, .chat-member-remove-button {
+  padding: 3px;
+  font-size: 16px;
+  color: white;
+}
+
+.chat-member-remove-button {
+  background-color: rgb(156, 17, 17);
+}
+
+.chat-member-promote-button {
+  background-color: green;
+  margin-bottom: 5px;
+}
+
+.chat-member-demote-button {
+  background-color: red;
+  margin-bottom: 5px;
+}
+
+.chat-leave-button, .new-group-create-button {
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 10px;
+  padding: 5px 10px 5px 10px;
+  font-size: 18px;
+  color: white;
+}
+
+.chat-leave-button {
+  background-color: red;
+}
+
+.new-group-create-button {
+  background-color: cornflowerblue;
 }
 
 .user-list-item {
@@ -471,14 +521,4 @@ input {
 .new-group-choose-members-checkbox {
   margin-right: 20px;
   transform: scale(1.5);
-}
-
-.new-group-create-button {
-  margin-left: auto;
-  margin-right: auto;
-  margin-bottom: 10px;
-  padding: 10px;
-  font-size: 18px;
-  color: white;
-  background-color: cornflowerblue;
 }

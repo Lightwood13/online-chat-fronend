@@ -1,11 +1,12 @@
-import React, { useEffect } from 'react';
-import { UserData } from '../../../model/UserData';
-import { UserListItem } from '../UserListItem';
+import React, { ReactNode, useEffect } from 'react';
+import { UserData } from '../../model/UserData';
+import { UserListItem } from './UserListItem';
 
 export type ConfirmationDialogResult = 'yes' | 'no' | 'cancel';
 
-export function FriendRemovalDialog(props: {
-    user: UserData,
+export function ConfirmationDialog(props: {
+    title: string,
+    children?: ReactNode,
     show: boolean,
     onResult: (result: ConfirmationDialogResult) => void
 }) {
@@ -30,8 +31,8 @@ export function FriendRemovalDialog(props: {
     return (
         <div className='modal-background' onClick={() => props.onResult('cancel')}>
             <div className='dialog' onClick={e => e.stopPropagation()}>
-                <div className='dialog-title'>Are you sure you want to remove friend?</div>
-                <UserListItem user={props.user}/>
+                <div className='dialog-title'>{props.title}</div>
+                {props.children}
                 <div className='dialog-buttons'>
                     <button 
                         className='dialog-button-yes' 

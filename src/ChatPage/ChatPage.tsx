@@ -4,7 +4,7 @@ import { Client, IMessage } from '@stomp/stompjs';
 import { useEffect, useState } from 'react';
 import useStateRef from 'react-usestateref';
 import { useNavigate } from 'react-router-dom';
-import { createNewGroup, getChatInfo, getChatList, getChatMessages, getFriendRequests, getFriends, getJWTToken, getUserInfo, getUsersInfo, hasJWTToken, parseJSON, sendMessage } from '../network';
+import { createNewGroup, demoteUser, getChatInfo, getChatList, getChatMessages, getFriendRequests, getFriends, getJWTToken, getUserInfo, getUsersInfo, hasJWTToken, kickUser, leaveChat, parseJSON, promoteUser, sendMessage } from '../network';
 import { ChatList } from './ChatList/ChatList';
 import { MessageArea } from './MessageArea/MessageArea';
 import { ChatInfo } from './modal/ChatInfo';
@@ -192,6 +192,41 @@ export function ChatPage() {
         setShowCreateNewGroup(false);
     }
 
+    async function onLeaveChat() {
+        if (activeChatId !== null) {
+            leaveChat(activeChatId);
+            const newLoadedChats = new Map(loadedChats);
+            const newMessageLists =  new Map(messageLists);
+            newLoadedChats.delete(activeChatId);
+            newMessageLists.delete(activeChatId);
+            setChatList(chatList.filter(c => c.id !== activeChatId));
+            setLoadedChats(newLoadedChats);
+            setMessageLists(newMessageLists);
+            setActiveChatId(null);
+        }
+    }
+
+    async function onPromote(userId: string) {
+        if (activeChatId !== null) {
+            await promoteUser(activeChatId, userId);
+            setLoadedChats(new Map(loadedChats.set(activeChatId, await getChatInfo(activeChatId))));
+        }
+    }
+
+    async function onDemote(userId: string) {
+        if (activeChatId !== null) {
+            await demoteUser(activeChatId, userId);
+            setLoadedChats(new Map(loadedChats.set(activeChatId, await getChatInfo(activeChatId))));
+        }
+    }
+
+    async function onKick(userId: string) {
+        if (activeChatId !== null) {
+            await kickUser(activeChatId, userId);
+            setLoadedChats(new Map(loadedChats.set(activeChatId, await getChatInfo(activeChatId))));
+        }
+    }
+
     const navigate = useNavigate();
     useEffect(() => {
         if (!hasJWTToken()) {
@@ -270,7 +305,13 @@ export function ChatPage() {
             chatInfo = <ChatInfo
                 chat={activeChat}
                 users={users}
+                userId={user.id}
+                isAdmin={activeChat.members.find(m => m.id === user.id)?.role === 'admin'}
                 show={showChatInfo}
+                onPromote={onPromote}
+                onDemote={onDemote}
+                onKick={onKick}
+                onLeaveChat={onLeaveChat}
                 onClose={() => setShowChatInfo(false)}
             />;
         }

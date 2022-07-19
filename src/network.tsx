@@ -45,15 +45,15 @@ export const getFriends = async() =>
 export const getFriendRequests = async() =>
     get<UserData[]>(`${serverUrl}/friend/request/pending`, []);
 
-export const sendFriendRequest = (username: string): Promise<AxiosResponse<any, any>> => {
+export const sendFriendRequest = (username: string): Promise<AxiosResponse> => {
     return axiosInstance.post(`${serverUrl}/friend/request/send/${username}`);
 };
 
-export const acceptFriendRequest = (userId: string): Promise<AxiosResponse<any, any>> => {
+export const acceptFriendRequest = (userId: string): Promise<AxiosResponse> => {
     return axiosInstance.post(`${serverUrl}/friend/request/accept/${userId}`);
 };
 
-export const rejectFriendRequest = (userId: string): Promise<AxiosResponse<any, any>> => {
+export const rejectFriendRequest = (userId: string): Promise<AxiosResponse> => {
     return axiosInstance.post(`${serverUrl}/friend/request/reject/${userId}`);
 };
 
@@ -61,26 +61,42 @@ export const removeFriend = async(friendId: string) => {
     await axiosInstance.post(`${serverUrl}/friend/remove/${friendId}`);
 };
 
-export function sendMessage(groupChatId: string, text: string) {
-    axiosInstance.post(`${serverUrl}/send`, {
+export async function sendMessage(groupChatId: string, text: string) {
+    await axiosInstance.post(`${serverUrl}/send`, {
                 groupChatId: groupChatId,
                 text: text
             });
 }
 
-export function uploadProfilePhoto(file: File, chatId: string | null) {
+export async function uploadProfilePhoto(file: File, chatId: string | null) {
     const formData = new FormData();
     formData.append('file', file, file.name);
     const url = chatId === null ? `${serverUrl}/profile-photo`
         : `${serverUrl}/chat/profile-photo/${chatId}`;
-    axiosInstance.post(url, formData);
+    await axiosInstance.post(url, formData);
 }
 
-export function createNewGroup(name: string, members: string[]) {
-    axiosInstance.post(`${serverUrl}/chat/create`, {
+export async function createNewGroup(name: string, members: string[]) {
+    await axiosInstance.post(`${serverUrl}/chat/create`, {
             name: name,
             members: members
         });
+}
+
+export async function leaveChat(chatId: string) {
+    await axiosInstance.delete(`${serverUrl}/chat/${chatId}/user/me`);
+}
+
+export async function kickUser(chatId: string, userId: string) {
+    await axiosInstance.delete(`${serverUrl}/chat/${chatId}/user/${userId}`);
+}
+
+export async function promoteUser(chatId: string, userId: string) {
+    await axiosInstance.put(`${serverUrl}/chat/${chatId}/admins/${userId}`);
+}
+
+export async function demoteUser(chatId: string, userId: string) {
+    await axiosInstance.delete(`${serverUrl}/chat/${chatId}/admins/${userId}`);
 }
 
 const dateFields = new Set(['sentOn', 'lastMessageSentOn', 'createdOn', 'timestamp']);

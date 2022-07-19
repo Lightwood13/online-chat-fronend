@@ -1,4 +1,4 @@
 export type MemberData = {
     id: string,
-    role: 'member' | 'user' | 'admin'
+    role: 'member' | 'admin'
 }

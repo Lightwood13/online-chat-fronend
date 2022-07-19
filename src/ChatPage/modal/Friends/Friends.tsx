@@ -2,10 +2,11 @@ import React, { useEffect, useRef, useState } from 'react';
 import { UserData } from '../../../model/UserData';
 import { FriendList } from './FriendList';
 import { acceptFriendRequest, rejectFriendRequest, removeFriend, sendFriendRequest } from '../../../network';
-import { FriendRemovalDialog, ConfirmationDialogResult } from './FriendRemovalDialog';
+import { ConfirmationDialog, ConfirmationDialogResult } from '../ConfirmationDialog';
 import { AddFriend } from './AddFriend';
 import axios from 'axios';
 import { FriendRequestList } from './FriendRequestList';
+import { UserListItem } from '../UserListItem';
 
 export function Friends(props: {
     friends: UserData[],
@@ -111,11 +112,15 @@ export function Friends(props: {
                     friends={props.friends}
                     onRemoveFriend={onRemoveFriend}
                 />
-                {friendToDelete && <FriendRemovalDialog
-                    user={friendToDelete}
-                    show={showConfirmationDialog}
-                    onResult={onConfirmationDialogClosed}
-                />}
+                {friendToDelete && 
+                    <ConfirmationDialog
+                        title='Are you sure you want to remove friend?'
+                        show={showConfirmationDialog}
+                        onResult={onConfirmationDialogClosed}
+                    >
+                        <UserListItem user={friendToDelete}/>
+                    </ConfirmationDialog>
+                }
             </div>
         </div>
     );

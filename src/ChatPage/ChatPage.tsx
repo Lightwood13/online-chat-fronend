@@ -4,7 +4,7 @@ import { Client, IMessage } from '@stomp/stompjs';
 import { useEffect, useState } from 'react';
 import useStateRef from 'react-usestateref';
 import { useNavigate } from 'react-router-dom';
-import { createNewGroup, demoteUser, getChatInfo, getChatList, getChatMessages, getFriendRequests, getFriends, getJWTToken, getUserInfo, getUsersInfo, hasJWTToken, kickUser, leaveChat, parseJSON, promoteUser, sendMessage } from '../network';
+import { createNewGroup, demoteUser, getChatInfo, getChatList, getChatMessages, getFriendRequests, getFriends, getJWTToken, getUserInfo, getUsersInfo, hasJWTToken, kickUser, leaveChat, parseJSON, promoteUser, sendMessage, serverUrl } from '../network';
 import { ChatList } from './ChatList/ChatList';
 import { MessageArea } from './MessageArea/MessageArea';
 import { ChatInfo } from './modal/ChatInfo';
@@ -43,7 +43,7 @@ export function ChatPage() {
     const [chatsSavedInput, setChatsSavedInput] = useState(new Map<string, string>());
 
     const [stompClient] = useState(new Client({
-        webSocketFactory: () => new SockJS('http://localhost:8080/ws-connect'),
+        webSocketFactory: () => new SockJS(`${serverUrl}/ws-connect`),
         connectHeaders: {
             'Authorization': 'Bearer ' + getJWTToken()
         }

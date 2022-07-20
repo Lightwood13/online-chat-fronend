@@ -1,6 +1,4 @@
 import React, { ReactNode, useEffect } from 'react';
-import { UserData } from '../../model/UserData';
-import { UserListItem } from './UserListItem';
 
 export type ConfirmationDialogResult = 'yes' | 'no' | 'cancel';
 

@@ -37,12 +37,12 @@ export function ChatPage() {
 
     const [scrollActiveChatToBottom, setScrollActiveChatToBottom] = useState(true);
     const [activeChatScrollPosition, setActiveChatScrollPosition] = useState(0);
-    const [activeChatScrolledToBottom, setActiveChatScrolledToBottom, activeChatScrolledToBottomRef] = useStateRef(true);
+    const [, setActiveChatScrolledToBottom, activeChatScrolledToBottomRef] = useStateRef(true);
     const [activeChatInput, setActiveChatInput] = useState('');
     const [chatsScrollPositions, setChatsScrollPositions] = useState(new Map<string, number>());
     const [chatsSavedInput, setChatsSavedInput] = useState(new Map<string, string>());
 
-    const [stompClient, setStompClient] = useState(new Client({
+    const [stompClient] = useState(new Client({
         webSocketFactory: () => new SockJS('http://localhost:8080/ws-connect'),
         connectHeaders: {
             'Authorization': 'Bearer ' + getJWTToken()
@@ -68,7 +68,7 @@ export function ChatPage() {
             stompClient.subscribe(`/user/${userId}/group-chat-profile-updates`, (message: IMessage) => {
                 onChatProfileUpdated(parseJSON(message.body));
             });
-            stompClient.subscribe(`/user/${userId}/friend-list-updates`, (message: IMessage) => {
+            stompClient.subscribe(`/user/${userId}/friend-list-updates`, () => {
                 onFriendListUpdated();
             });
         }

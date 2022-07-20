@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { UserData } from '../../../model/UserData';
 import { FriendList } from './FriendList';
-import { acceptFriendRequest, rejectFriendRequest, removeFriend, sendFriendRequest } from '../../../network';
+import { acceptFriendRequest, isErrorResponse, rejectFriendRequest, removeFriend, sendFriendRequest } from '../../../network';
 import { ConfirmationDialog, ConfirmationDialogResult } from '../ConfirmationDialog';
 import { AddFriend } from './AddFriend';
 import axios from 'axios';
@@ -57,9 +57,11 @@ export function Friends(props: {
             setAddFriendError(null);
             setAddFriendInfo('Friend request sent');
         }
-        catch (err: any) {
+        catch (err) {
             if (axios.isAxiosError(err) && err.response) {
-                setAddFriendError((err.response.data as any).message);
+                if (isErrorResponse(err.response.data)) {
+                    setAddFriendError(err.response.data.message);
+                }
             }
         }
     }

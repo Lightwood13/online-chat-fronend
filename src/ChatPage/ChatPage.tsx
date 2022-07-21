@@ -143,6 +143,7 @@ export function ChatPage() {
     function onSendMessage() {
         if (activeChatId !== null && activeChatInput.trim().length !== 0) {
             sendMessage(activeChatId, activeChatInput.trim());
+            setActiveChatInput('');
         }
     }
 

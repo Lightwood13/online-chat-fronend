@@ -3,6 +3,7 @@ import { MessageData } from '../../model/MessageData';
 
 import defaultProfilePhoto from '../../images/default.png';
 import { UserData } from '../../model/UserData';
+import { serverUrl } from '../../network';
 
 export const Message = (props: {
     data: MessageData,
@@ -13,7 +14,7 @@ export const Message = (props: {
             className='message-profile-photo'
             src={ props.author === undefined || props.author.profilePhotoLocation === null
                     ? defaultProfilePhoto
-                    : `http://localhost:8080/photo/${props.author.profilePhotoLocation}`
+                    : `${serverUrl}/photo/${props.author.profilePhotoLocation}`
                 }
         />
         <div className='message-bubble'>

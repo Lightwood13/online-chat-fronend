@@ -1,6 +1,6 @@
 import React, { FormEvent, useState } from 'react';
 import { Link, useNavigate } from "react-router-dom";
-import { updateJWTToken } from '../network';
+import { serverUrl, updateJWTToken } from '../network';
 
 export function LoginPage()  {
 
@@ -20,7 +20,7 @@ export function LoginPage()  {
             setErrorMessage("Password can't be empty");
             return;
         } 
-        const response = await fetch('http://localhost:8080/login', {
+        const response = await fetch(`${serverUrl}/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

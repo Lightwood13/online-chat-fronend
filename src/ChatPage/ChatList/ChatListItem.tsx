@@ -2,6 +2,7 @@ import React from 'react';
 import moment from 'moment';
 import defaultGroupProfilePhoto from '../../images/default_group.png';
 import { ChatDataWithLastMessageAndAuthorName } from '../../model/ChatDataWithLastMessageAndAuthorName';
+import { serverUrl } from '../../network';
 
 function formatDate(date: Date): string {
     if (new Date().getTime() - date.getTime() <= 86400000)
@@ -24,7 +25,7 @@ export const ChatListItem = (props: {
             className='chat-profile-photo'
             src={props.data.profilePhotoLocation === null
                 ? defaultGroupProfilePhoto
-                : `http://localhost:8080/photo/${props.data.profilePhotoLocation}`
+                : `${serverUrl}/photo/${props.data.profilePhotoLocation}`
             }
         />
         <div className='chat-summary'>

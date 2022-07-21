@@ -4,7 +4,8 @@ import { ChatDataWithLastMessage } from './model/ChatDataWithLastMessage';
 import { MessageData } from './model/MessageData';
 import { UserData } from './model/UserData';
 
-export const serverUrl = 'http://ec2-18-193-47-130.eu-central-1.compute.amazonaws.com:8080';
+export const serverUrl = 'https://api.onlinechat.party:8443';
+// export const serverUrl = 'https://localhost:8443';
 
 const axiosInstance = axios.create({
     transformResponse: parseJSON

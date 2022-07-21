@@ -2,6 +2,7 @@ import React, { ReactNode } from 'react';
 import { UserData } from '../../model/UserData';
 
 import defaultProfilePhoto from '../../images/default.png';
+import { serverUrl } from '../../network';
 
 export const UserListItem = (props: {
     user: UserData,
@@ -11,7 +12,7 @@ export const UserListItem = (props: {
         <img className='message-profile-photo' src={
             props.user === undefined || props.user.profilePhotoLocation === null
             ? defaultProfilePhoto
-            : `http://localhost:8080/photo/${props.user.profilePhotoLocation}`
+            : `${serverUrl}/photo/${props.user.profilePhotoLocation}`
         }/>
         <div className='user-list-item-name'>{
             props.user === undefined ? '[deleted]' : props.user.name
@@ -29,7 +30,7 @@ export const UserListItemWithLeftContent = (props: {
         <img className='message-profile-photo' src={
             props.user === undefined || props.user.profilePhotoLocation === null
             ? defaultProfilePhoto
-            : `http://localhost:8080/photo/${props.user.profilePhotoLocation}`
+            : `${serverUrl}/photo/${props.user.profilePhotoLocation}`
         }/>
         <div className='user-list-item-name'>{
             props.user === undefined ? '[deleted]' : props.user.name

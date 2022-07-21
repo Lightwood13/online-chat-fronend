@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { uploadProfilePhoto } from '../../../network';
+import { serverUrl, uploadProfilePhoto } from '../../../network';
 
 export function ProfileHeader(props: {
     initialProfilePhotoLocation: string | null
@@ -8,7 +8,7 @@ export function ProfileHeader(props: {
     profileName: string
 }) {
     const profilePhotoUrl = props.initialProfilePhotoLocation !== null
-        ? `http://localhost:8080/photo/${props.initialProfilePhotoLocation}`
+        ? `${serverUrl}/photo/${props.initialProfilePhotoLocation}`
         : props.defaultProfilePhotoUrl;
     const hiddenFileInput = useRef<HTMLInputElement | null>(null);
 

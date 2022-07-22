@@ -41,6 +41,7 @@ svg {
   flex: 0 1 auto;
   width: 20%;
   min-width: 250px;
+  overflow-y: auto;
   float: left;
   margin: 0;
   padding: 0;
